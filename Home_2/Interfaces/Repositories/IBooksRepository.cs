@@ -5,8 +5,8 @@ namespace Home_2.Interfaces.Repositories;
 public interface IBooksRepository
 {
     IEnumerable<Book> GetAll();
-    Book GetById(int id);
+    Book? GetById(int id);
     Book Create(Book book);
     Book Update(Book book);
-    string Delete(int id);
+    Book? Delete(int id);
 }

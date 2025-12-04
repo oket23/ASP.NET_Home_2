@@ -2,6 +2,7 @@ namespace Home_2.DTOs.Book;
 
 public class UpdateBookDTO
 {
+    public int Id { get; set; }
     public string? Name { get; set; }
     public int? PublicationYear { get; set; }
     public int? AuthorId { get; set; }
