@@ -9,8 +9,13 @@ public class BooksService : IBooksService
 {
     private readonly IBooksRepository _booksRepository;
     private readonly IValidationService _validationService;
-    public BooksService(IBooksRepository repository, IValidationService validationService)
+    private int _randomId;
+
+    public BooksService(
+        IBooksRepository repository, 
+        IValidationService validationService)
     {
+        _randomId = 1;
         _booksRepository = repository;
         _validationService = validationService;
     }
@@ -20,59 +25,82 @@ public class BooksService : IBooksService
         return _booksRepository.GetAll();
     }
 
-    public Book GetById(int id)
+    public Book? GetById(int id)
     {
-        if (id <= 0)
-        {
-            throw new ArgumentException("Id can't be zero or negative");
-        }
-        var book = _booksRepository.GetById(id);
+        return _booksRepository.GetById(id);
+    }
 
-        if (book == null)
+    public Book Create(AddBookDTO addBookDto)
+    {
+        if (!_validationService.IsValidAuthor(addBookDto.AuthorId))
         {
-            throw new ArgumentException("Book not found");
+            throw new ArgumentException("Author with given id does not exist.");
         }
+       
+        if (!_validationService.IsValidDescription(addBookDto.Description))
+        {
+            throw new ArgumentException("Description contains censored words or is invalid.");
+        }
+
+        var book = new Book
+        {
+            Id = GetRandomId(),
+            Name = addBookDto.Name,
+            PublicationYear = addBookDto.PublicationYear,
+            AuthorId = addBookDto.AuthorId,
+            Description = addBookDto.Description
+        };
         
-        return book;
+        return _booksRepository.Create(book);
     }
 
-    public Book Create(AddBookDTO book)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Book Update(UpdateBookDTO updateBookDto)
+    public Book? Update(UpdateBookDTO updateBookDto)
     {
         var book = _booksRepository.GetById(updateBookDto.Id);
         
         if (book == null)
         {
-            throw new NullReferenceException("Book to update not found");
+            return null;
+        }
+        
+        var newAuthorId = updateBookDto.AuthorId ?? book.AuthorId;
+        var newDescription = updateBookDto.Description ?? book.Description;
+        
+        if (!_validationService.IsValidAuthor(newAuthorId))
+        {
+            throw new ArgumentException("Author with given id does not exist.");
+        }
+        
+        if (!_validationService.IsValidDescription(newDescription))
+        {
+            throw new ArgumentException("Description contains censored words or is invalid.");
         }
 
-        return _booksRepository.Update(new Book
+        var updatedBook = new Book
         {
-            Id = updateBookDto.Id,
+            Id = book.Id,
             Name = updateBookDto.Name ?? book.Name,
             PublicationYear = updateBookDto.PublicationYear ?? book.PublicationYear,
-            AuthorId = updateBookDto.AuthorId ?? book.AuthorId, // перевіряти чи автор існує
-            Description = updateBookDto.Description ?? book.Description // валідувати опис
-        });
+            AuthorId = newAuthorId,
+            Description = newDescription
+        };
+
+        return _booksRepository.Update(updatedBook);
     }
 
-    public string Delete(int id)
+    public string? Delete(int id)
     {
-        if (id <= 0)
-        {
-            throw new ArgumentException("Id can't be zero or negative");
-        }
-
         var book = _booksRepository.Delete(id);
         if (book == null)
         {
-            throw new ArgumentException("Book not found");
+            return null;
         }
 
         return $"Deleted book id:{book.Id}";
+    }
+
+    private int GetRandomId()
+    {
+        return _randomId++;
     }
 }

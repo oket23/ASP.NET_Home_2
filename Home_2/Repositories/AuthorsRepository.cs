@@ -9,12 +9,17 @@ public class AuthorsRepository : IAuthorsRepository
 
     public IEnumerable<Author> GetAll()
     {
-        return _authors ?? new List<Author>();
+        return _authors;
     }
 
     public Author? GetById(int id)
     {
-        return _authors.FirstOrDefault(a => a.Id == id) ?? new Author();
+        var author = _authors.FirstOrDefault(a => a.Id == id);
+        if (author is null)
+        {
+            return null;
+        }
+        return author;
     }
 
     public Author Create(Author author)

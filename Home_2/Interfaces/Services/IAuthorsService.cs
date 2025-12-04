@@ -7,8 +7,9 @@ public interface IAuthorsService
 {
     
     IEnumerable<Author> GetAll();
-    Author GetById(int id);
+    Author? GetById(int id);
     Author Create(AddAuthorDTO book);
-    Author Update(UpdateAuthorDTO book);
-    string Delete(int id);
+    Author? Update(UpdateAuthorDTO book);
+    string? Delete(int id);
+    AuthorWithBooksDTO? GetByIdWithBooks(int id);
 }

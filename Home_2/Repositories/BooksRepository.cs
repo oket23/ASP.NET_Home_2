@@ -14,7 +14,12 @@ public class BooksRepository : IBooksRepository
 
     public Book? GetById(int id)
     {
-        return _books.FirstOrDefault(a => a.Id == id);
+        var book = _books.FirstOrDefault(a => a.Id == id);
+        if (book is null)
+        {
+            return null;
+        }
+        return book;
     }
 
     public Book Create(Book book)
@@ -23,9 +28,14 @@ public class BooksRepository : IBooksRepository
         return book;
     }
 
-    public Book Update(Book book)
+    public Book? Update(Book book)
     {
         var bookToUpdate = _books.FirstOrDefault(a => a.Id == book.Id);
+
+        if (bookToUpdate is null)
+        {
+            return null;
+        }
         
         bookToUpdate.Name = book.Name;
         bookToUpdate.Description = book.Description;
@@ -46,5 +56,10 @@ public class BooksRepository : IBooksRepository
 
         _books.Remove(bookToDelete);
         return bookToDelete;
+    }
+    
+    public IEnumerable<Book> GetByAuthorId(int authorId)
+    {
+        return _books.Where(b => b.AuthorId == authorId).ToList();
     }
 }
