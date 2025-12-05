@@ -15,11 +15,13 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddSwaggerGen();
 
-        builder.Services.AddTransient<IValidationService, ValidationService>();
         builder.Services.AddSingleton<IAuthorsRepository, AuthorsRepository>();
-        builder.Services.AddSingleton<IAuthorsService, AuthorsService>();
         builder.Services.AddSingleton<IBooksRepository, BooksRepository>();
-        builder.Services.AddSingleton<IBooksService, BooksService>();
+        
+        builder.Services.AddScoped<IAuthorsService, AuthorsService>();
+        builder.Services.AddScoped<IBooksService, BooksService>();
+        
+        builder.Services.AddTransient<IValidationService, ValidationService>();
         
         var app = builder.Build();
         
